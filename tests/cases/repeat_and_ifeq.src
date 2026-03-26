@@ -1,0 +1,6 @@
+set word = "hi"
+repeat 3
+ifeq word "hi"
+say "ok"
+endif
+endrepeat

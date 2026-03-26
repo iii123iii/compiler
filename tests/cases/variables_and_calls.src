@@ -1,0 +1,6 @@
+let thing = "compiler"
+func show
+print thing
+endfunc
+call show
+call show
