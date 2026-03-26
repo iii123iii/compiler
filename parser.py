@@ -188,22 +188,6 @@ class Parser:
             f"    mov qword [{len_label}], 1",
         ])
 
-
-    def _emit_random_num(self, name, low, high, line):
-        if low > high:
-            raise ValueError(f"line {line}: randomnum requires min <= max")
-        label = self._ensure_num_symbol(name, line)
-        target = self._target_lines()
-        target.extend([
-            f"    ; randomnum from line {line}",
-            "    rdtsc",
-            "    xor rdx, rdx",
-            f"    mov rcx, {high - low + 1}",
-            "    div rcx",
-            f"    add rdx, {low}",
-            f"    mov [{label}], rdx",
-        ])
-
     def _emit_string_if_start(self, left_parts, right_parts, line):
         left = self._resolve_value(left_parts, line)
         right = self._resolve_value(right_parts, line)
@@ -360,12 +344,6 @@ class Parser:
             if len(tokens) != 4:
                 raise ValueError(f"line {line}: expected syntax random <name> <min> <max>")
             self._emit_random(tokens[1], int(tokens[2]), int(tokens[3]), line)
-            return
-
-        if instruction in {"randomnum", "randnum"}:
-            if len(tokens) != 4:
-                raise ValueError(f"line {line}: expected syntax randomnum <name> <min> <max>")
-            self._emit_random_num(tokens[1], int(tokens[2]), int(tokens[3]), line)
             return
 
         if instruction in {"func", "function"}:
