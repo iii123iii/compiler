@@ -1,6 +1,7 @@
-# Guess the Number (fixed target: 76)
-num secret = 76
-say "I picked a number. Try to guess it!"
+# Guess the Number (random target: 1..100)
+randomnum secret 1 100
+say "I picked a random number between 1 and 100."
+
 
 loop
 asknum guess "Your guess: "

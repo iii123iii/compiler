@@ -1,5 +1,6 @@
 from lexer import Lexer
 from parser import Parser
+import argparse
 import os
 import shutil
 import subprocess
@@ -21,7 +22,7 @@ def compile_source(source_path):
     return parser.finish()
 
 
-def build_executable(asm_code, output_name="output"):
+def build_executable(asm_code, output_name="output", keep_asm=False):
     asm_file = "output.asm"
     obj_file = "output.o"
 
@@ -29,7 +30,7 @@ def build_executable(asm_code, output_name="output"):
         f.write(asm_code)
 
     if shutil.which("nasm") is None or shutil.which("ld") is None:
-        print("Warning: nasm and/or ld not found. Generated output.asm only.")
+        print("Warning: nasm and/or ld not found. Generated output.asm only.", flush=True)
         return False
 
     subprocess.run(["nasm", "-f", "elf64", asm_file, "-o", obj_file], check=True)
