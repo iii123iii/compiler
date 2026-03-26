@@ -1,0 +1,20 @@
+# Guess the Number (fixed target: 76)
+num secret = 76
+say "I picked a number. Try to guess it!"
+
+loop
+asknum guess "Your guess: "
+
+ifnumeq guess secret
+say "You found it!"
+exit 0
+endif
+
+ifnumgt guess secret
+say "The number is smaller."
+endif
+
+ifnumlt guess secret
+say "The number is more."
+endif
+endloop

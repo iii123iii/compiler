@@ -1,0 +1,10 @@
+func greet
+print "Welcome"
+return
+endfunc
+
+call greet
+input name "Enter name: "
+printraw "Hello, "
+print name
+exit 3
