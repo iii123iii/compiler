@@ -1,0 +1,15 @@
+num secret = 76
+repeat 3
+asknum guess "Your guess: "
+ifnumeq guess secret
+say "win"
+exit 0
+endif
+ifnumgt guess secret
+say "smaller"
+endif
+ifnumlt guess secret
+say "more"
+endif
+endrepeat
+exit 1

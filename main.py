@@ -1,40 +1,54 @@
 from lexer import Lexer
 from parser import Parser
 import os
-
-line = input("File> ")
-
-data = '''section .data'''
-
-start = ""
-
-with open(line, 'r') as file:
-    i = 0
-    for line in file:
-        line = line.strip()
-        if not line:
-            continue  
-
-        print(f"Processing line {i}: {line}") 
-
-        tokens = Lexer(line).lexer() 
-        print(f"Tokens: {tokens}")  
-
-        start, data = Parser(tokens, data, start, i).parse() 
-
-        i += 1 
+import shutil
+import subprocess
+import sys
 
 
-start += "\nmov eax, 1\nxor ebx, ebx\nint 0x80" 
+def compile_source(source_path):
+    parser = Parser()
 
-code = f"{data}\n\nsection .text\nglobal _start\n\n_start:\n{start}"
+    with open(source_path, "r", encoding="utf-8") as file:
+        for line_no, raw_line in enumerate(file, start=1):
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
 
-with open("output.asm", "w") as f:
-    f.write(code)
+            tokens = Lexer(line).lexer()
+            parser.parse(tokens, line_no)
 
-os.system("nasm -f elf64 output.asm -o output.o")
-print("Linking output.asm")
-os.remove("output.asm")
-os.system("ld output.o -o output")
-print("Generating executable")
-os.remove("output.o")
+    return parser.finish()
+
+
+def build_executable(asm_code, output_name="output"):
+    asm_file = "output.asm"
+    obj_file = "output.o"
+
+    with open(asm_file, "w", encoding="utf-8") as f:
+        f.write(asm_code)
+
+    if shutil.which("nasm") is None or shutil.which("ld") is None:
+        print("Warning: nasm and/or ld not found. Generated output.asm only.")
+        return False
+
+    subprocess.run(["nasm", "-f", "elf64", asm_file, "-o", obj_file], check=True)
+    subprocess.run(["ld", obj_file, "-o", output_name], check=True)
+
+    os.remove(asm_file)
+    os.remove(obj_file)
+    print(f"Generated executable: {output_name}")
+    return True
+
+
+def main():
+    source_path = sys.argv[1] if len(sys.argv) > 1 else input("File> ").strip()
+    if not os.path.exists(source_path):
+        raise FileNotFoundError(f"Source file not found: {source_path}")
+
+    asm_code = compile_source(source_path)
+    build_executable(asm_code)
+
+
+if __name__ == "__main__":
+    main()
